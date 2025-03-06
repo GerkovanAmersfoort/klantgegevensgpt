@@ -1,6 +1,7 @@
-import streamlit as st  # Hiermee maken we de website
+import streamlit as st
+import pandas as pd
 
-# Functie om de GPT-prompt te maken
+# Functie om de GPT-prompt te genereren
 def generate_custom_gpt_prompt(client_name, age, fitness_goal, experience_level, training_preferences, injuries, dietary_restrictions, motivation_style):
     return f"""
     Je bent een virtuele personal trainer genaamd {client_name}'s AI-Coach. Je begeleidt {client_name} in hun fitnessreis door op maat gemaakte adviezen en motivatie te geven. Houd rekening met de volgende klantgegevens:
@@ -15,9 +16,9 @@ def generate_custom_gpt_prompt(client_name, age, fitness_goal, experience_level,
     
     **Jouw taken:**
     1. Geef gepersonaliseerde trainingsadviezen.
-    2. Geef voedingssuggesties.
-    3. Motiveer {client_name} met berichten.
-    4. Check de voortgang en stel aanpassingen voor.
+    2. Geef voedingssuggesties die passen bij de doelen en dieetvoorkeuren van {client_name}.
+    3. Motiveer {client_name} met berichten en aanmoediging op basis van hun motivatiestijl.
+    4. Check periodiek de voortgang en stel aanpassingen voor.
     5. Beantwoord vragen over training, voeding en herstel.
     """
 
@@ -34,28 +35,35 @@ injuries = st.text_area("Blessures of lichamelijke beperkingen")
 dietary_restrictions = st.text_area("Voedingsvoorkeuren of restricties")
 motivation_style = st.selectbox("Motivatiestijl", ["Streng", "Ondersteunend", "Speels", "Data-gedreven"])
 
-# Knop om de GPT-prompt te genereren
+# Knop om de GPT-prompt te genereren en op te slaan
 if st.button("Genereer Prompt"):
     if client_name and fitness_goal:
         prompt = generate_custom_gpt_prompt(client_name, age, fitness_goal, experience_level, training_preferences, injuries, dietary_restrictions, motivation_style)
+
+        # ✅ Opslaan in een CSV-bestand
+        data = {
+            "Naam": [client_name],
+            "Leeftijd": [age],
+            "Doelstelling": [fitness_goal],
+            "Ervaringsniveau": [experience_level],
+            "Trainingsvoorkeuren": [training_preferences],
+            "Blessures": [injuries],
+            "Voedingsrestricties": [dietary_restrictions],
+            "Motivatiestijl": [motivation_style],
+            "GPT Prompt": [prompt]
+        }
+
+        df = pd.DataFrame(data)
+        df.to_csv("klantgegevens.csv", mode='a', index=False, header=False)  # Voeg toe aan CSV-bestand
+
+        st.success("De klantgegevens zijn opgeslagen en klaar om in je Custom GPT te gebruiken!")
+
+        # ✅ Laat de gegenereerde GPT-prompt zien
         st.text_area("Gegenereerde GPT Prompt", prompt, height=300)
     else:
         st.warning("Vul ten minste de naam en het fitnessdoel in om een prompt te genereren.")
-import pandas as pd
 
-# Opslaan in een CSV-bestand
-data = {
-    "Naam": [client_name],
-    "Leeftijd": [age],
-    "Doelstelling": [fitness_goal],
-    "Ervaringsniveau": [experience_level],
-    "Trainingsvoorkeuren": [training_preferences],
-    "Blessures": [injuries],
-    "Voedingsrestricties": [dietary_restrictions],
-    "Motivatiestijl": [motivation_style],
-    "GPT Prompt": [prompt]
-}
-
-df = pd.DataFrame(data)
-df.to_csv("klantgegevens.csv", mode='a', index=False, header=False)
-st.success("De gegevens zijn opgeslagen en klaar om in je Custom GPT te gebruiken!")
+# ✅ Downloadknop om CSV-bestand op te halen
+if st.button("Download Klantgegevens"):
+    with open("klantgegevens.csv", "rb") as file:
+        st.download_button(label="Download klantgegevens", data=file, file_name="klantgegevens.csv", mime="text/csv")
