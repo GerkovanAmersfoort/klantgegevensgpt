@@ -23,7 +23,7 @@ def generate_custom_gpt_prompt(client_name, age, fitness_goal, experience_level,
     """
 
 # Titel van de website
-st.title("GPT Prompt Generator voor Personal Trainers")
+st.title("GPT gegevens klanten personal home gym")
 
 # Invoervelden voor de gebruiker
 client_name = st.text_input("Naam van de klant")
