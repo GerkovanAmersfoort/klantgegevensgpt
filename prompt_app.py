@@ -41,3 +41,21 @@ if st.button("Genereer Prompt"):
         st.text_area("Gegenereerde GPT Prompt", prompt, height=300)
     else:
         st.warning("Vul ten minste de naam en het fitnessdoel in om een prompt te genereren.")
+import pandas as pd
+
+# Opslaan in een CSV-bestand
+data = {
+    "Naam": [client_name],
+    "Leeftijd": [age],
+    "Doelstelling": [fitness_goal],
+    "Ervaringsniveau": [experience_level],
+    "Trainingsvoorkeuren": [training_preferences],
+    "Blessures": [injuries],
+    "Voedingsrestricties": [dietary_restrictions],
+    "Motivatiestijl": [motivation_style],
+    "GPT Prompt": [prompt]
+}
+
+df = pd.DataFrame(data)
+df.to_csv("klantgegevens.csv", mode='a', index=False, header=False)
+st.success("De gegevens zijn opgeslagen en klaar om in je Custom GPT te gebruiken!")
